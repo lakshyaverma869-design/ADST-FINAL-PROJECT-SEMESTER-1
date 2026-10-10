@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Live Prediction · EV Charging Forecast{% endblock %}
+{% block content %}
+<section class="page-heading"><p class="eyebrow">Mode 1 · Current conditions</p><h1>Live Prediction</h1><p>Select a city and let the app collect current conditions. No weather or traffic fields need to be typed.</p></section>
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+<form class="form-card compact-form" method="post">
+  <label>City
+    <select name="city" required>{% for city in cities %}<option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>{% endfor %}</select>
+  </label>
+  <button class="button" type="submit">Predict Now</button>
+</form>
+
+{% if prediction is not none %}
+<section class="result-banner">
+  <p class="eyebrow">Model estimate · prediction #{{ prediction_id }}</p>
+  <h2>Predicted EV Charging Demand</h2>
+  <div class="prediction-number">{{ prediction }} <span>sessions/hour</span></div>
+  <p class="result-explainer">{{ selected_city }} at {{ local_now.strftime('%A, %d %b %Y %H:%M') }} local time · {{ peak_period|replace('_',' ')|title }}</p>
+  <p class="small-note">Estimate from the Random Forest trained on synthetic labels. It is not an observed station-session count.</p>
+</section>
+<section class="result-grid">
+  <article class="panel"><p class="eyebrow">Retrieved current conditions</p><h2>Weather and traffic indicator</h2>
+    <dl class="detail-list">
+      <div><dt>Temperature</dt><dd>{% if weather.temperature is not none %}{{ "%.1f"|format(weather.temperature) }} °C{% else %}Unavailable{% endif %}</dd></div>
+      <div><dt>Weather</dt><dd>{{ weather.weather_condition }}</dd></div>
+      <div><dt>Rainfall</dt><dd>{% if weather.rainfall is not none %}{{ "%.1f"|format(weather.rainfall) }} mm{% else %}Unavailable{% endif %}</dd></div>
+      <div><dt>Relative humidity</dt><dd>{% if weather.relative_humidity is not none %}{{ "%.0f"|format(weather.relative_humidity) }}%{% else %}Unavailable{% endif %}</dd></div>
+      <div><dt>Traffic status</dt><dd>{{ traffic.traffic_status|replace('_',' ')|title }}</dd></div>
+      {% if traffic.current_speed is not none %}<div><dt>Nearest road segment</dt><dd>{{ traffic.current_speed|round|int }} km/h current · {{ traffic.free_flow_speed|round|int }} km/h free-flow</dd></div>{% endif %}
+      <div><dt>Weather time</dt><dd>{{ weather.weather_time }}</dd></div>
+    </dl>
+  </article>
+  <article class="panel panel-tint"><p class="eyebrow">Data source and status</p><h2>Where inputs came from</h2>
+    {% include "_source_list.html" %}
+    <p class="small-note">Traffic status is a road-segment indicator near a fixed city reference point. It is not a city-wide traffic-volume count. EV count and actual sessions are not available and are not model inputs.</p>
+  </article>
+</section>
+{% endif %}
+{% endblock %}

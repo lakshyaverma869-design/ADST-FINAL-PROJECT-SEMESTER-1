@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Future Forecast · EV Charging Forecast{% endblock %}
+{% block content %}
+<section class="page-heading"><p class="eyebrow">Mode 3 · Forecast / model estimate</p><h1>Future Forecast</h1><p>Choose a city-hour. Weather forecast is used only when the API provides the selected hour.</p></section>
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+<form class="form-card compact-form future-form" method="post">
+  <label>City<select name="city" required>{% for city in cities %}<option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>{% endfor %}</select></label>
+  <label>Future date<input type="date" name="future_date" value="{{ future_date or '' }}" min="{{ today }}" required></label>
+  <label>Future time<input type="time" name="future_time" value="{{ future_time or '18:00' }}" required></label>
+  <button class="button" type="submit">Forecast Demand</button>
+</form>
+{% if prediction is not none %}
+<section class="result-banner">
+  <p class="eyebrow">Forecast / model estimate · prediction #{{ prediction_id }}</p>
+  <h2>Estimated EV Charging Demand</h2>
+  <div class="prediction-number">{{ prediction }} <span>sessions/hour</span></div>
+  <p class="result-explainer">{{ selected_city }} · {{ target.strftime('%A, %d %b %Y %H:%M') }} local time · {{ peak_period|replace('_',' ')|title }}</p>
+  <p class="notice notice-warm">Future values are model estimates and may differ from actual charging demand.</p>
+  {% if weather.notice %}<p class="small-note">{{ weather.notice }}</p>{% endif %}
+</section>
+<section class="result-grid">
+  <article class="panel"><p class="eyebrow">Expected conditions</p><h2>Weather and traffic indicator</h2>
+    <dl class="detail-list">
+      <div><dt>Temperature</dt><dd>{% if weather.temperature is not none %}{{ "%.1f"|format(weather.temperature) }} °C{% else %}Unavailable{% endif %}</dd></div>
+      <div><dt>Weather</dt><dd>{{ weather.weather_condition }}</dd></div>
+      <div><dt>Rainfall</dt><dd>{% if weather.rainfall is not none %}{{ "%.1f"|format(weather.rainfall) }} mm{% else %}Unavailable{% endif %}</dd></div>
+      <div><dt>Relative humidity</dt><dd>{% if weather.relative_humidity is not none %}{{ "%.0f"|format(weather.relative_humidity) }}%{% else %}Unavailable{% endif %}</dd></div>
+      <div><dt>Traffic</dt><dd>Unknown; no future traffic forecast configured</dd></div>
+      <div><dt>Weather source</dt><dd>{{ weather.source }}</dd></div>
+      {% if weather.retrieved_at %}<div><dt>Retrieved at</dt><dd>{{ weather.retrieved_at }}</dd></div>{% endif %}
+    </dl>
+  </article>
+  <article class="panel panel-tint"><p class="eyebrow">Source status</p><h2>Inputs and scope</h2>{% include "_source_list.html" %}
+    <p class="small-note">This is a city-level estimate from a Random Forest trained with synthetic labels. EV counts, future traffic, and actual sessions are not available.</p>
+  </article>
+</section>
+{% endif %}
+{% endblock %}

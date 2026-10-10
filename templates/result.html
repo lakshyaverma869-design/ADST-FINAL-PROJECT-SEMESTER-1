@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Prediction result · EV Charging Forecast{% endblock %}
+{% block content %}
+<section class="result-banner">
+  <p class="eyebrow">Prediction saved · #{{ prediction_id }}</p>
+  <h1>Estimated demand</h1>
+  <div class="prediction-number">{{ predicted_demand }} <span>sessions</span></div>
+  <p class="result-explainer">Estimated charging sessions for {{ inputs.city }} during the selected one-hour period. This is a model estimate based on synthetic training data.</p>
+</section>
+<section class="result-grid">
+  <article class="panel">
+    <p class="eyebrow">Your inputs</p>
+    <h2>Scenario summary</h2>
+    <dl class="detail-list">
+      <div><dt>City</dt><dd>{{ inputs.city }}</dd></div>
+      <div><dt>Hour and day</dt><dd>{{ "%02d:00"|format(inputs.hour) }} · {{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][inputs.day_of_week] }}</dd></div>
+      <div><dt>Peak period</dt><dd>{{ peak_period|replace('_', ' ')|title }}</dd></div>
+      <div><dt>Traffic volume</dt><dd>{{ inputs.traffic_volume|round|int }} vehicles/hour</dd></div>
+      <div><dt>Average speed</dt><dd>{{ inputs.average_speed }} km/h</dd></div>
+      <div><dt>Weather</dt><dd>{{ inputs.weather_condition }} · {{ inputs.temperature }} °C · {{ inputs.rainfall }} mm rain</dd></div>
+      <div><dt>Estimated EV count</dt><dd>{{ inputs.ev_count }} EVs/hour</dd></div>
+      <div><dt>Submitted at</dt><dd>{{ created_at }}</dd></div>
+    </dl>
+  </article>
+  <aside class="panel panel-tint">
+    <p class="eyebrow">A note about the number</p>
+    <h2>Use it as a learning result</h2>
+    <p>This project predicts from synthetic examples. Real charging demand depends on station capacity, charger availability, local travel patterns, and many other factors that are not included here.</p>
+    <a class="button" href="{{ url_for('predict') }}">Try another scenario</a>
+  </aside>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}History · EV Charging Forecast{% endblock %}
+{% block content %}
+<section class="page-heading"><p class="eyebrow">Local SQLite database</p><h1>History and Reports</h1><p>Saved values are model estimates, not actual charging sessions.</p></section>
+<section class="section-heading" id="predictions"><div><p class="eyebrow">Predictions</p><h2>Recent results</h2></div></section>
+{% if predictions %}
+<div class="table-wrap"><table><thead><tr><th>ID</th><th>Generated at</th><th>City</th><th>Mode</th><th>Target time</th><th>Estimated demand</th></tr></thead><tbody>{% for row in predictions %}<tr><td>{{ row.id }}</td><td>{{ row.timestamp }}</td><td>{{ row.city }}</td><td>{{ row.prediction_mode|title }}</td><td>{{ row.forecast_for or 'Current / historical range' }}</td><td><strong>{{ row.predicted_demand|round|int }}</strong> sessions/hour</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="empty-state"><h2>No predictions saved</h2><p>Run Live Prediction, Historical Analysis, or Future Forecast to create a record.</p></div>{% endif %}
+
+<section class="section-heading" id="reports"><div><p class="eyebrow">Historical analyses</p><h2>Generated reports</h2></div></section>
+{% if analyses %}
+<div class="table-wrap"><table><thead><tr><th>City</th><th>Date range</th><th>Created</th><th>Report</th></tr></thead><tbody>{% for item in analyses %}<tr><td>{{ item.city }}</td><td>{{ item.start_date }} to {{ item.end_date }}</td><td>{{ item.created_at }}</td><td><a href="{{ url_for('report', analysis_id=item.id) }}">Open / print report</a></td></tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="empty-state"><p>Historical analysis reports will be listed here after an analysis.</p><a class="text-link" href="{{ url_for('historical_analysis') }}">Start Historical Analysis →</a></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Home · Dynamic EV Charging Forecasting{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="eyebrow">Data Science and Machine Learning project</p>
+    <h1>Dynamic EV Charging Forecasting</h1>
+    <p class="lead">An ML-based system that estimates EV charging demand using traffic indicators, weather, time and city-level information.</p>
+    <p class="notice notice-warm"><strong>Important:</strong> The model estimates charging sessions. This project does not measure actual charging demand; training labels are synthetic.</p>
+  </div>
+  <aside class="hero-note">
+    <span class="note-icon">↗</span>
+    <h2>Three ways to explore</h2>
+    <p>Use current weather for a live estimate, historical weather for analysis, or available forecast weather for a future estimate.</p>
+    <p class="small-note">Traffic and EV count are only used when supported by an explicitly identified source.</p>
+  </aside>
+</section>
+
+<section class="mode-grid">
+  <article class="mode-card"><p class="eyebrow">Mode 1</p><h2>Live Prediction</h2><p>Select a city. Current weather is retrieved automatically; optional live road-flow status is reported when a TomTom key is configured.</p><a class="button" href="{{ url_for('live_prediction') }}">Open Live Prediction</a></article>
+  <article class="mode-card"><p class="eyebrow">Mode 2</p><h2>Historical Analysis</h2><p>Choose a city and date range. Open-Meteo historical weather is combined with clearly labelled model estimates.</p><a class="button button-outline" href="{{ url_for('historical_analysis') }}">Open Historical Analysis</a></article>
+  <article class="mode-card"><p class="eyebrow">Mode 3</p><h2>Future Forecast</h2><p>Choose a future city-hour. Forecast weather is used when available; longer dates use a labelled historical weather analogue.</p><a class="button button-outline" href="{{ url_for('future_forecast') }}">Open Future Forecast</a></article>
+</section>
+
+<section class="section-heading"><div><p class="eyebrow">Data sources and availability</p><h2>What each number represents</h2></div></section>
+<div class="source-grid">
+  {% for item in source_cards %}
+  <article class="source-card"><span class="status-dot"></span><div><h3>{{ item.name }}</h3><p>{{ item.source }}</p></div></article>
+  {% endfor %}
+</div>
+<div class="split-section">
+  <div><p class="eyebrow">Model at a glance</p><h2>Random Forest regression</h2>
+    <p>The model was trained on a synthetic dataset. Training fields are transformed to match the fields available to current, historical and future prediction modes. When traffic is unavailable, the model receives the explicit unknown status.</p>
+    {% if metrics %}
+    <div class="mini-metrics"><span>MAE <strong>{{ "%.2f"|format(metrics.mae) }}</strong></span><span>RMSE <strong>{{ "%.2f"|format(metrics.rmse) }}</strong></span><span>R² <strong>{{ "%.2f"|format(metrics.r2) }}</strong></span></div>
+    <p class="small-note">Holdout metrics are from synthetic records and do not measure real-world accuracy.</p>
+    {% endif %}
+  </div>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename='images/demand_by_hour.png') }}" alt="Synthetic training demand by hour"><figcaption>Training data only: generated demand profile by hour</figcaption></figure>
+</div>
+{% endblock %}

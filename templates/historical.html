@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Historical Analysis · EV Charging Forecast{% endblock %}
+{% block content %}
+<section class="page-heading"><p class="eyebrow">Mode 2 · Historical weather reanalysis</p><h1>Historical Analysis</h1><p>Open-Meteo archive weather is retrieved for the selected dates. Demand is model-estimated, and historical traffic is left unavailable.</p></section>
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+<form class="form-card compact-form historical-form" method="post">
+  <label>City<select name="city" required>{% for city in cities %}<option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>{% endfor %}</select></label>
+  <label>Start date<input type="date" name="start_date" value="{{ start_date or '' }}" max="{{ today }}" required></label>
+  <label>End date<input type="date" name="end_date" value="{{ end_date or '' }}" max="{{ today }}" required></label>
+  <button class="button" type="submit">Analyze</button>
+</form>
+{% if summary %}
+<section class="section-heading"><div><p class="eyebrow">{{ selected_city }} · {{ start_date }} to {{ end_date }}</p><h2>Analysis summary</h2></div><a class="button button-outline" href="{{ url_for('report', analysis_id=analysis_id) }}">Generate Analysis Report</a></section>
+<div class="stat-grid stat-grid-six">
+  <article class="stat-card"><span>Average demand</span><strong>{{ "%.1f"|format(summary.average_demand) }}</strong><small>Model estimates / hour</small></article>
+  <article class="stat-card"><span>Maximum demand</span><strong>{{ "%.0f"|format(summary.maximum_demand) }}</strong><small>Model estimates / hour</small></article>
+  <article class="stat-card"><span>Minimum demand</span><strong>{{ "%.0f"|format(summary.minimum_demand) }}</strong><small>Model estimates / hour</small></article>
+  <article class="stat-card"><span>Peak-demand hour</span><strong>{{ "%02d:00"|format(summary.peak_hour) }}</strong><small>Mean {{ "%.1f"|format(summary.peak_hour_average) }} sessions/hour</small></article>
+  <article class="stat-card"><span>Most active day</span><strong class="smaller-stat">{{ summary.most_active_day }}</strong><small>Estimated {{ "%.1f"|format(summary.most_active_day_average) }} per hour</small></article>
+  <article class="stat-card"><span>Weather / traffic</span><strong class="smaller-stat">{% if summary.average_temperature is not none %}{{ "%.1f"|format(summary.average_temperature) }} °C{% else %}—{% endif %}</strong><small>Traffic: {{ summary.average_traffic }}</small></article>
+</div>
+<p class="notice notice-warm"><strong>Data limitation:</strong> Weather is archived model reanalysis. Historical traffic and actual charging sessions are not available from the configured free sources. All charging-demand values below are model estimates.</p>
+
+<section class="section-heading"><div><p class="eyebrow">Charts with observations</p><h2>Patterns in the selected period</h2></div></section>
+<div class="analysis-grid">
+  <figure class="chart-frame"><img src="{{ url_for('static', filename=charts.demand_by_hour) }}" alt="Historical model-estimated demand by hour"><figcaption>Demand by hour</figcaption><p class="observation">{{ observations[0] }}</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename=charts.demand_over_time) }}" alt="Demand estimates by date"><figcaption>Demand over time</figcaption><p class="observation">The daily average values shown are estimates for this selected weather period; use the daily line to see within-period variation.</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename=charts.traffic_vs_demand) }}" alt="Traffic indicator availability and estimated demand"><figcaption>Traffic vs demand availability</figcaption><p class="observation">{{ observations[2] }}</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename=charts.temperature_vs_demand) }}" alt="Temperature vs model-estimated demand"><figcaption>Temperature and estimated demand</figcaption><p class="observation">{% if observations|length > 3 %}{{ observations[3] }}{% else %}Each point is a model estimate paired with retrieved historical weather for this period.{% endif %}</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename=charts.weather_vs_demand) }}" alt="Weather categories and estimated demand"><figcaption>Weather condition and estimated demand</figcaption><p class="observation">{% if observations|length > 1 %}{{ observations[1] }}{% else %}The chart groups estimates by the weather categories returned for these dates.{% endif %}</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename=charts.weekday_weekend) }}" alt="Weekday vs weekend estimates"><figcaption>Weekday vs weekend</figcaption><p class="observation">These are model-estimated averages, separated using the selected dates' local weekdays.</p></figure>
+</div>
+<details class="panel"><summary>Data sources and retrieval status</summary>{% with sources=sources %}{% include "_source_list.html" %}{% endwith %}</details>
+{% endif %}
+{% endblock %}

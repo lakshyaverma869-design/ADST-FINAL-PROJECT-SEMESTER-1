@@ -1,0 +1,46 @@
+{
+  "dataset_type": "synthetic",
+  "observations": [
+    "Generated examples have their highest hourly mean at 18:00 (23.7 sessions/hour) and lowest at 02:00 (6.9 sessions/hour).",
+    "The generated weekend mean is 1.5 sessions/hour lower than the weekday mean.",
+    "Clear has the highest generated mean among weather categories (14.2 sessions/hour).",
+    "Generated traffic volume and target have Pearson r=0.78; volume is an EDA-only field, not a prediction input."
+  ],
+  "hourly_means": {
+    "0": 7.286,
+    "1": 7.025,
+    "2": 6.903,
+    "3": 7.189,
+    "4": 7.303,
+    "5": 8.711,
+    "6": 11.322,
+    "7": 18.85,
+    "8": 21.397,
+    "9": 19.775,
+    "10": 17.172,
+    "11": 12.922,
+    "12": 12.653,
+    "13": 12.567,
+    "14": 13.731,
+    "15": 15.019,
+    "16": 20.122,
+    "17": 23.078,
+    "18": 23.722,
+    "19": 21.558,
+    "20": 17.681,
+    "21": 10.592,
+    "22": 8.336,
+    "23": 7.336
+  },
+  "weather_means": {
+    "Clear": 14.22,
+    "Cloudy": 13.724,
+    "Foggy": 13.576,
+    "Rainy": 12.612
+  },
+  "weekday_weekend_means": {
+    "weekday": 14.29,
+    "weekend": 12.746
+  },
+  "traffic_volume_target_correlation": 0.7836683074965491
+}

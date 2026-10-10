@@ -1,0 +1,40 @@
+{
+  "mae": 3.473533359148167,
+  "mse": 19.792065815543133,
+  "rmse": 4.448827465247796,
+  "r2": 0.6362788758185477,
+  "rows_before_cleaning": 8640,
+  "rows_after_cleaning": 8640,
+  "train_rows": 6912,
+  "test_rows": 1728,
+  "target": "charging_demand",
+  "target_unit": "model-estimated charging sessions per city-hour",
+  "dataset_type": "synthetic",
+  "missing_traffic_augmentation_share": 0.2,
+  "random_state": 42,
+  "features": [
+    "city",
+    "hour",
+    "day_of_week",
+    "traffic_status",
+    "temperature",
+    "rainfall",
+    "weather_condition",
+    "relative_humidity",
+    "peak_period"
+  ],
+  "categorical_features": [
+    "city",
+    "traffic_status",
+    "weather_condition",
+    "peak_period"
+  ],
+  "numeric_features": [
+    "hour",
+    "day_of_week",
+    "temperature",
+    "rainfall",
+    "relative_humidity"
+  ],
+  "model": "RandomForestRegressor"
+}

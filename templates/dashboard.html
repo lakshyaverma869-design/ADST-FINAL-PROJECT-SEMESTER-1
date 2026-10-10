@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · EV Charging Forecast{% endblock %}
+{% block content %}
+<section class="page-heading"><p class="eyebrow">Project overview</p><h1>Dashboard</h1><p>Saved prediction counts come from SQLite. Training charts below use synthetic data and are labelled as such.</p></section>
+<div class="stat-grid stat-grid-six">
+  <article class="stat-card"><span>Total predictions</span><strong>{{ summary.total }}</strong><small>All prediction modes</small></article>
+  <article class="stat-card"><span>Average demand</span><strong>{{ "%.1f"|format(summary.average) }}</strong><small>Estimated sessions/hour</small></article>
+  <article class="stat-card"><span>Highest demand</span><strong>{{ summary.highest|round|int }}</strong><small>Estimated sessions/hour</small></article>
+  <article class="stat-card"><span>Lowest demand</span><strong>{{ summary.lowest|round|int }}</strong><small>Estimated sessions/hour</small></article>
+  <article class="stat-card"><span>Cities analyzed</span><strong>{{ summary.cities }}</strong><small>Distinct saved cities</small></article>
+  <article class="stat-card"><span>Prediction modes</span><strong>{{ (summary.live_count or 0) + (summary.historical_count or 0) + (summary.future_count or 0) }}</strong><small>Live / historical / future</small></article>
+</div>
+<div class="mode-counts"><span>Live <strong>{{ summary.live_count or 0 }}</strong></span><span>Historical <strong>{{ summary.historical_count or 0 }}</strong></span><span>Future <strong>{{ summary.future_count or 0 }}</strong></span></div>
+<section class="section-heading"><div><p class="eyebrow">ML model analysis</p><h2>Training and saved-prediction views</h2></div></section>
+<div class="analysis-grid">
+  <figure class="chart-frame"><img src="{{ url_for('static', filename='images/demand_by_hour.png') }}" alt="Synthetic training demand by hour"><figcaption>Demand by hour · synthetic training data</figcaption><p class="observation">{{ insights.observations[0] if insights.observations|length > 0 else 'The hourly curve describes generated examples only, not a live city demand profile.' }}</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename='images/demand_over_time.png') }}" alt="Synthetic training demand over dates"><figcaption>Demand trend · synthetic training data</figcaption><p class="observation">Each point is the generated dataset's average target for a date. It does not show measured station activity.</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename='images/demand_by_weather.png') }}" alt="Synthetic training demand by weather"><figcaption>Weather categories · synthetic training data</figcaption><p class="observation">{{ insights.observations[2] if insights.observations|length > 2 else 'Generated target averages are grouped by generated weather labels; this is not a measured effect.' }}</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename='images/traffic_vs_demand.png') }}" alt="Synthetic traffic volume and demand"><figcaption>Traffic volume vs demand · synthetic training data</figcaption><p class="observation">{{ insights.observations[3] if insights.observations|length > 3 else 'Traffic volume is retained for exploratory charts only. It is not a prediction input.' }}</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename='images/feature_importance.png') }}" alt="Calculated Random Forest feature importance"><figcaption>Feature importance · fitted model</figcaption><p class="observation">Bars are aggregated from the fitted Random Forest's calculated impurity importance; they indicate model splits, not causality.</p></figure>
+  <figure class="chart-frame"><img src="{{ url_for('static', filename=mode_chart) }}" alt="Saved prediction mode counts"><figcaption>Prediction modes · SQLite records</figcaption><p class="observation">This chart counts saved Live, Historical, and Future records in the local database.</p></figure>
+</div>
+<section class="panel"><p class="eyebrow">Model evaluation</p><h2>Held-out synthetic test split</h2>
+  <div class="mini-metrics"><span>MAE <strong>{{ "%.3f"|format(metrics.mae) }}</strong></span><span>MSE <strong>{{ "%.3f"|format(metrics.mse) }}</strong></span><span>RMSE <strong>{{ "%.3f"|format(metrics.rmse) }}</strong></span><span>R² <strong>{{ "%.3f"|format(metrics.r2) }}</strong></span></div>
+  <figure class="chart-frame chart-narrow"><img src="{{ url_for('static', filename='images/actual_vs_predicted.png') }}" alt="Actual vs predicted synthetic test values"><figcaption>Actual vs predicted · synthetic held-out records</figcaption></figure>
+</section>
+{% if recent %}
+<section class="section-heading"><div><p class="eyebrow">Recent activity</p><h2>Saved predictions</h2></div><a class="text-link" href="{{ url_for('history') }}">Full history →</a></section>
+<div class="table-wrap"><table><thead><tr><th>Time</th><th>City</th><th>Mode</th><th>Forecast target</th><th>Estimated demand</th></tr></thead><tbody>{% for row in recent %}<tr><td>{{ row.timestamp }}</td><td>{{ row.city }}</td><td>{{ row.prediction_mode|title }}</td><td>{{ row.forecast_for or 'Current / selected history' }}</td><td><strong>{{ row.predicted_demand|round|int }}</strong> sessions/hour</td></tr>{% endfor %}</tbody></table></div>
+{% endif %}
+{% endblock %}

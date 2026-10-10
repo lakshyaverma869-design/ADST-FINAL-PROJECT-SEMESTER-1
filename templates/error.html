@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Data unavailable · EV Charging Forecast{% endblock %}
+{% block content %}
+<section class="empty-state error-state"><p class="eyebrow">Could not complete request</p><h1>Something needs attention</h1><p>{{ message }}</p><a class="button" href="{{ url_for('index') }}">Return home</a></section>
+{% endblock %}

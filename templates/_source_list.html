@@ -1,0 +1,5 @@
+<ul class="source-list">
+  {% for item in sources %}
+  <li><span class="source-status">{{ item.status }}</span><div><strong>{{ item.name }}</strong><small>{{ item.source }}{% if item.retrieved_at %}<br>Last updated: {{ item.retrieved_at }}{% endif %}{% if item.note %}<br>{{ item.note }}{% endif %}</small></div></li>
+  {% endfor %}
+</ul>

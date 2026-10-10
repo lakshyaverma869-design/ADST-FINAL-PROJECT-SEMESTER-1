@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Make a prediction · EV Charging Forecast{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">Prediction</p>
+  <h1>Describe a city-hour</h1>
+  <p>Enter traffic and weather conditions. The result is an estimate of charging sessions during that hour.</p>
+</section>
+
+{% if error %}
+<div class="alert" role="alert">{{ error }}</div>
+{% endif %}
+
+<form class="form-card" method="post" action="{{ url_for('predict') }}">
+  <div class="form-section-title"><span>01</span><div><h2>Place and time</h2><p>Choose a location and the hour being estimated.</p></div></div>
+  <div class="form-grid">
+    <label>City
+      <select name="city" required>
+        {% for city in cities %}<option value="{{ city }}" {% if values.get('city') == city %}selected{% endif %}>{{ city }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Hour <span class="field-hint">24-hour time</span>
+      <input type="number" name="hour" min="0" max="23" step="1" value="{{ values.get('hour', 18) }}" required>
+    </label>
+    <label>Day of week
+      <select name="day_of_week" required>
+        {% set selected_day = values.get('day_of_week', '0')|string %}
+        {% for day in [('0','Monday'), ('1','Tuesday'), ('2','Wednesday'), ('3','Thursday'), ('4','Friday'), ('5','Saturday'), ('6','Sunday')] %}
+          <option value="{{ day[0] }}" {% if selected_day == day[0] %}selected{% endif %}>{{ day[1] }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <div class="form-section-title"><span>02</span><div><h2>Traffic and weather</h2><p>Use reasonable values for the selected hour.</p></div></div>
+  <div class="form-grid">
+    <label>Traffic volume <span class="field-hint">vehicles/hour</span>
+      <input type="number" name="traffic_volume" min="0" max="5000" step="1" value="{{ values.get('traffic_volume', 1400) }}" required>
+    </label>
+    <label>Average speed <span class="field-hint">km/h</span>
+      <input type="number" name="average_speed" min="0" max="130" step="0.1" value="{{ values.get('average_speed', 38) }}" required>
+    </label>
+    <label>Temperature <span class="field-hint">°C</span>
+      <input type="number" name="temperature" min="-20" max="60" step="0.1" value="{{ values.get('temperature', 27) }}" required>
+    </label>
+    <label>Rainfall <span class="field-hint">mm</span>
+      <input type="number" name="rainfall" min="0" max="300" step="0.1" value="{{ values.get('rainfall', 0) }}" required>
+    </label>
+    <label>Weather condition
+      <select name="weather_condition" required>
+        {% for condition in weather_conditions %}<option value="{{ condition }}" {% if values.get('weather_condition', 'Clear') == condition %}selected{% endif %}>{{ condition }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Estimated EV count <span class="field-hint">EVs/hour</span>
+      <input type="number" name="ev_count" min="0" max="5000" step="1" value="{{ values.get('ev_count', 70) }}" required>
+    </label>
+  </div>
+  <div class="form-foot">
+    <p>The model derives peak period from the hour. All form fields use the same inputs as the training pipeline.</p>
+    <button class="button" type="submit">Predict charging demand</button>
+  </div>
+</form>
+{% endblock %}

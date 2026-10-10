@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A student ML project estimating EV charging demand from weather, time and traffic indicators.">
+  <title>{% block title %}Dynamic EV Charging Forecasting{% endblock %}</title>
+  {% if embedded_css %}<style>{{ embedded_css|safe }}</style>{% else %}<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">{% endif %}
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">EV</span><span>Charging Forecast</span></a>
+  <nav aria-label="Main navigation">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('live_prediction') }}">Live Prediction</a>
+    <a href="{{ url_for('historical_analysis') }}">Historical Analysis</a>
+    <a href="{{ url_for('future_forecast') }}">Future Forecast</a>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('history') }}">History</a>
+    <a href="{{ url_for('history') }}#reports">Reports</a>
+  </nav>
+</header>
+<main class="page">
+  {% block content %}{% endblock %}
+</main>
+<footer class="site-footer">
+  <p>MCA Data Science project · Charging demand values are model estimates, never measured sessions in this project.</p>
+</footer>
+</body>
+</html>
